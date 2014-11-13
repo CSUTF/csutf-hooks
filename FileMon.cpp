@@ -38,8 +38,22 @@ namespace FileMon
 
         static void Main(string[] args)
         {
+			Int32 TargetPID = 0;
+			//Added
+			
+			if ((args.Length != 1) || !Int32.TryParse(args[0], out TargetPID))
+			{
+				Console.WriteLine();
+				Console.WriteLine("Usage: FileMon %PID%");
+				Console.WriteLine();
+
+				// return;
+			}
+
+
             try
             {                
+				//Im thinking it registers the hook??
             Config.Register(
                     "A FileMon like demo application.",
                     "FileMon.exe",
@@ -47,10 +61,26 @@ namespace FileMon
 
                 RemoteHooking.IpcCreateServer<FileMonInterface>(
                      ref ChannelName, WellKnownObjectMode.SingleCall);
+				//Added
+				//Gets Processlist
+				Process[] ProcList = Process.GetProcesses();
+				String FileName;
+				Int32 Id;
+				//Looks for notepad and gets its PID..very Useful
+				for (int i = 0; i < ProcList.Length; i++)
+				{
+					Process Proc = ProcList[i];
+					FileName = Proc.ProcessName;
+					Id = Proc.Id;
+					if (FileName == "notepad")
+						TargetPID = Id;
+				}
 
-                RemoteHooking.Inject(
-                    Int32.Parse(args[0]),
-                    "FileMonInject.dll",
+				RemoteHooking.Inject(
+
+					//Int32.Parse(args[0]),
+					TargetPID = Id;
+					"FileMonInject.dll",
                     "FileMonInject.dll",
                     ChannelName);
 
